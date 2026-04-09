@@ -1,30 +1,28 @@
 extends CharacterBody2D
 
 # ==========================================
-# --- EVOLUTION STATE ---
+# --- THE COMMAND TOGGLE (STATE MACHINE) ---
 # ==========================================
-@export var hover_unlocked: bool = true 
+# True = Magnetic Levitation (Hover) | False = Dirt Bound (Rolling)
+@export var hover_unlocked: bool = false
 
 # ==========================================
-# --- MOVEMENT CONSTANTS ---
+# --- KINEMATIC CONSTANTS ---
 # ==========================================
 const SPEED = 350.0          
 const ACCEL = 2500.0         
 const FRICTION = 2000.0      
-const JUMP_VELOCITY = -800.0 
+const JUMP_VELOCITY = -600 
+const GRAVITY = 980
 
-# ==========================================
-# --- TRUE HOVER CONSTANTS ---
-# ==========================================
+# --- FORM 1: ROLLING CONSTANTS ---
+const ROLL_SPEED_MULTIPLIER = 0.015 
+
+# --- FORM 2: HOVER CONSTANTS ---
 const BASE_HOVER_HEIGHT = 80.0   
 const CROUCH_HOVER      = 49.0   
 const HOVER_MAGNETISM   = 10.0   
 const HOVER_SMOOTHING   = 14.0   
-
-# ==========================================
-# --- ROLLING CONSTANTS ---
-# ==========================================
-const ROLL_SPEED_MULTIPLIER = 0.015 
 
 # --- SENSORY CONSTANTS ---
 const EYE_MOVE_RADIUS = 6.4
@@ -38,7 +36,12 @@ const BLINK_VARIANCE  = 2.0
 const CAPSULE_RADIUS: float = 30.0
 const CAPSULE_HEIGHT: float = 97.4
 
-# --- CAMERA TRACKING CONSTANTS ---
+# --- WEAPONRY CONSTANTS (SEMI-AUTO) ---
+const LASER_RANGE = 1500.0
+const LASER_COOLDOWN = 0.6  # Heat sink refresh rate
+const LASER_DURATION = 0.15 # Beam visual flash duration
+
+# --- CAMERA CONSTANTS ---
 const CAM_LOOK_AHEAD = 250.0     
 const CAM_SMOOTHING  = 3.0       
 const CAM_IDLE_FRACTION = 0.5   
@@ -54,6 +57,12 @@ const CAM_IDLE_FRACTION = 0.5
 @onready var ground_ray      = $GroundRay 
 @onready var collision_shape = $CollisionShape2D 
 
+# --- TWIN-LINKED OPTICS ---
+@onready var laser_ray_R     = $LaserRayRight
+@onready var laser_line_R    = $LaserLineRight
+@onready var laser_ray_L     = $LaserRayLeft
+@onready var laser_line_L    = $LaserLineLeft
+
 # ==========================================
 # --- INTERNAL MEMORY ---
 # ==========================================
@@ -65,22 +74,41 @@ var target_eye_scale_y  = 1.0
 var blink_timer         = 0.0
 var next_blink          = 0.0
 var is_blinking         = false
-
 var target_cam_offset   = 0.0
 var facing_direction    = 1.0 
-
 var current_hover_target = BASE_HOVER_HEIGHT
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
+# --- WEAPON TIMERS ---
+var laser_cooldown_timer = 0.0
+var laser_duration_timer = 0.0
+var trigger_reset = true 
+
+# --- OBSERVABILITY ---
+var debug_timer = 0.0 
+
 func _ready():
-	print("--- SYSTEM BOOT: METAMORPHOSIS PROTOCOL ---")
-	if not ground_ray:
-		print("CRITICAL ERROR: GroundRay sensor absent.")
-	else:
-		ground_ray.enabled = true
-		ground_ray.collision_mask = self.collision_mask 
-		ground_ray.target_position = Vector2(0, 2000)
-		ground_ray.hit_from_inside = true
+	print("--- SARGE'S UNIFIED MASTER BOOT SEQUENCE ---")
+	
+	# --- RADAR CALIBRATION (THE ANTI-FLYING FIX) ---
+	ground_ray.enabled = true
+	ground_ray.collision_mask = self.collision_mask 
+	ground_ray.target_position = Vector2(0, 2000)
+	ground_ray.hit_from_inside = false # CRITICAL: Do not read internal geometry!
+	ground_ray.add_exception(self)     # CRITICAL: Ignore the Bean's own physical hull!
+	
+	# --- TWIN WEAPONS OVERRIDE ---
+	laser_ray_R.top_level = true
+	laser_line_R.top_level = true
+	laser_line_R.global_position = Vector2.ZERO 
+	
+	laser_ray_L.top_level = true
+	laser_line_L.top_level = true
+	laser_line_L.global_position = Vector2.ZERO 
+	
+	# --- FRIENDLY FIRE OVERRIDE ---
+	laser_ray_R.add_exception(self)
+	laser_ray_L.add_exception(self)
 		
 	right_eye_origin   = right_eye.position
 	left_eye_origin    = left_eye.position
@@ -90,19 +118,40 @@ func _ready():
 	_schedule_next_blink()
 
 func _physics_process(delta):
+	# --- DIAGNOSTIC TELEMETRY ---
+	debug_timer += delta
+	var do_print = false
+	if debug_timer >= 0.5:
+		do_print = true
+		debug_timer = 0.0
+		print("\n--- TACTICAL TELEMETRY ---")
+		
+	if velocity.y > 0:
+		gravity = GRAVITY * 1.2
+	else:
+		gravity = GRAVITY
+		
+
 	var is_detecting_ground = ground_ray.is_colliding()
+	ground_ray.position.x = self.position.x 
+	ground_ray.position.y = self.position.y
 	var distance_to_floor = 9999.0
 	
 	if is_detecting_ground:
 		distance_to_floor = ground_ray.get_collision_point().y - global_position.y
+		if do_print: print("Radar Ping: Ground at ", distance_to_floor)
+	elif do_print:
+		print("Radar Ping: VOID (No Ground)")
 
-	# --- STATE MACHINE FORWARDING ---
+	# --- THE BRAIN (STATE MACHINE) ---
 	if hover_unlocked:
+		if do_print: print("State: ASCENDED (Hover)")
 		_process_hover_physics(delta, is_detecting_ground, distance_to_floor)
 	else:
+		if do_print: print("State: GROUNDED (Rolling)")
 		_process_rolling_physics(delta)
 
-	# --- LATERAL KINEMATICS ---
+	# --- LATERAL LOCOMOTION ---
 	var direction = Input.get_axis("ui_left", "ui_right")
 	if direction != 0:
 		velocity.x = move_toward(velocity.x, direction * SPEED, ACCEL * delta)
@@ -112,19 +161,18 @@ func _physics_process(delta):
 	move_and_slide()
 
 # ==========================================
-# STATE 1: THE GROUNDED BEAN (ROLLING)
+# --- FORM 1: MUD ROLLING ---
 # ==========================================
 func _process_rolling_physics(delta):
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
 # ==========================================
-# STATE 2: THE MAGNETIC HOVERCRAFT
+# --- FORM 2: MAGNETIC LEVITATION ---
 # ==========================================
 func _process_hover_physics(delta, is_detecting_ground, distance_to_floor):
 	if Input.is_action_pressed("ui_down"):
 		current_hover_target = lerp(current_hover_target, CROUCH_HOVER, 10.0 * delta)
-		
 	else:
 		current_hover_target = lerp(current_hover_target, BASE_HOVER_HEIGHT, 10.0 * delta)
 
@@ -139,41 +187,28 @@ func _process_hover_physics(delta, is_detecting_ground, distance_to_floor):
 		velocity.y += gravity * delta
 
 # ==========================================
-# --- VISUAL & AUXILIARY PROCESSING ---
+# --- AUXILIARY SYSTEMS ---
 # ==========================================
 func _process(delta):
 	_update_visuals(delta)
 	_update_camera(delta)
+	_tick_weapons(delta)
 
 func _update_visuals(delta):
-	# --- METAMORPHOSIS VISUALS & PHYSICS ---
-	
 	if hover_unlocked:
-		var upright_angle = lerp_angle(visuals.rotation, 0.0, 10.0 * delta)
-		visuals.rotation = upright_angle
+		visuals.rotation = lerp_angle(visuals.rotation, 0.0, 10.0 * delta)
 		collision_shape.rotation = lerp_angle(collision_shape.rotation, 0.0, 10.0 * delta)
-		visuals.position.y = 0.0  # Hover: no offset needed
-	else:
-		var spin_amount = velocity.x * ROLL_SPEED_MULTIPLIER * delta
-		visuals.rotation += spin_amount
-
-		var righting_strength = 10.0
-		visuals.rotation = lerp_angle(visuals.rotation, 0.0, righting_strength * abs(cos(visuals.rotation)) * delta)
-
-		collision_shape.rotation = 0.0
 		visuals.position.y = 0.0
+	else:
+		if is_on_floor() or abs(velocity.y) < 10.0:
+			var spin_amount = velocity.x * ROLL_SPEED_MULTIPLIER * delta
+			visuals.rotation += spin_amount
+			
+		collision_shape.rotation = lerp_angle(collision_shape.rotation, deg_to_rad(90.0), 10.0 * delta)
+		var max_gap = (CAPSULE_HEIGHT / 2.0) - CAPSULE_RADIUS 
+		var anti_clip_lift = - (1.0 - abs(sin(visuals.rotation))) * max_gap
+		visuals.position.y = anti_clip_lift
 
-		# [FIX]: Keep collision UPRIGHT (0°) so the body sits at full capsule height.
-		# Rotating it to 90° was the root cause — it dropped the center too low.
-		collision_shape.rotation = lerp_angle(collision_shape.rotation, 0.0, 10.0 * delta)
-
-		# [THE GROUNDING FORMULA]: Pin the visual bottom to the floor as the bean spins.
-		# As the sprite rotates to its side, we push visuals DOWN to compensate for
-		# the shrinking vertical extent. This creates natural rolling contact bobbing.
-		var half_h: float = (CAPSULE_HEIGHT / 2.0)   # 18.7px
-		visuals.position.y = half_h * (1.0 - abs(cos(visuals.rotation)))
-
-	# --- EYE TRACKING ---
 	var mouse_pos = get_global_mouse_position()
 	var inside    = _is_inside_capsule(mouse_pos)
 	
@@ -190,6 +225,59 @@ func _update_visuals(delta):
 	_update_eye(right_eye, right_eye_origin, mouse_pos, inside, delta)
 	_update_eye(left_eye,  left_eye_origin,  mouse_pos, inside, delta)
 
+
+# ==========================================
+# --- WEAPONS SUBSYSTEM (BURST LASERS) ---
+# ==========================================
+func _tick_weapons(delta):
+	if laser_cooldown_timer > 0.0:
+		laser_cooldown_timer -= delta
+		
+	if laser_duration_timer > 0.0:
+		laser_duration_timer -= delta
+		var mouse_pos = get_global_mouse_position()
+		_process_beam(laser_ray_R, laser_line_R, right_eye, mouse_pos)
+		_process_beam(laser_ray_L, laser_line_L, left_eye, mouse_pos)
+	else:
+		laser_line_R.visible = false
+		laser_line_L.visible = false
+
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		trigger_reset = true
+
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and laser_cooldown_timer <= 0.0 and trigger_reset:
+		laser_cooldown_timer = LASER_COOLDOWN
+		laser_duration_timer = LASER_DURATION
+		trigger_reset = false 
+		
+		laser_line_R.visible = true
+		laser_line_L.visible = true
+		print(">> WEAPONS: Semi-Auto Burst Discharged!")
+
+func _process_beam(ray: RayCast2D, line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
+	ray.global_position = eye_sprite.global_position
+	var aim_direction = (target_pos - ray.global_position).normalized()
+	
+	ray.target_position = aim_direction * LASER_RANGE
+	ray.force_raycast_update() 
+	
+	line.clear_points()
+	line.add_point(ray.global_position)
+	
+	if ray.is_colliding():
+		line.add_point(ray.get_collision_point())
+		
+		# --- INTERROGATION PROTOCOL RESTORED ---
+		# Check if the object we hit is a Receiver!
+		var target = ray.get_collider()
+		if target and target.has_method("hit_by_laser"):
+			target.hit_by_laser()
+	else:
+		line.add_point(ray.global_position + (aim_direction * LASER_RANGE))
+
+# ==========================================
+# --- UTILITY SUBSYSTEMS ---
+# ==========================================
 func _update_camera(delta):
 	var move_dir = Input.get_axis("ui_left", "ui_right")
 	if move_dir != 0:

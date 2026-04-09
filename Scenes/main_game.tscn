@@ -7,12 +7,14 @@
 [node name="MainGame" type="Node2D"]
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("1_l756w")]
-position = Vector2(68.99988, -57.00006)
+position = Vector2(68.00001, -57)
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
-position = Vector2(-689.9987, 570.00055)
+position = Vector2(-670.0001, -2429.9998)
 scale = Vector2(9.999999, 9.999999)
+zoom = Vector2(0.6, 0.6)
 position_smoothing_enabled = true
 script = ExtResource("2_0e3vx")
 
 [node name="Level1" parent="." instance=ExtResource("3_0e3vx")]
+position = Vector2(41, 9)

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bfxppx6w5wcd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_54vv7"]
+size = Vector2(89, 13)
+
+[node name="LaserReciever" type="Node2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(44.5, -6.5)
+shape = SubResource("RectangleShape2D_54vv7")
