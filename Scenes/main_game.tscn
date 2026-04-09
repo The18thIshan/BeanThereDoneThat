@@ -1,13 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://dxgk18dll8s74"]
+[gd_scene load_steps=5 format=3 uid="uid://dxgk18dll8s74"]
 
 [ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/BeanPlayer.tscn" id="1_l756w"]
 [ext_resource type="Script" uid="uid://macer6vn8y3o" path="res://camera_2d.gd" id="2_0e3vx"]
+<<<<<<< Updated upstream
 [ext_resource type="PackedScene" uid="uid://dh6fhfq4oq67v" path="res://Scenes/leveltrial.tscn" id="2_pu3va"]
+=======
+[ext_resource type="PackedScene" uid="uid://d4gt364iqtqr0" path="res://Scenes/Levels/Level1.tscn" id="3_0e3vx"]
+[ext_resource type="PackedScene" uid="uid://bxb3tp2swo6nr" path="res://Scenes/Parallax.tscn" id="3_6j5ir"]
+>>>>>>> Stashed changes
 
 [node name="MainGame" type="Node2D"]
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("1_l756w")]
 position = Vector2(68.99988, -57.00006)
+
+[node name="Parallax" parent="CharacterBody2D" instance=ExtResource("3_6j5ir")]
+top_level = true
+position = Vector2(8070, -1920)
+scale = Vector2(2.5, 2.5)
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
 position = Vector2(-689.9987, 570.00055)
