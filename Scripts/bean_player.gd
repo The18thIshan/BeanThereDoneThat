@@ -265,13 +265,14 @@ func _process_beam(ray: RayCast2D, line: Line2D, eye_sprite: Sprite2D, target_po
 	line.add_point(ray.global_position)
 	
 	if ray.is_colliding():
+		# Stop at impact
 		line.add_point(ray.get_collision_point())
 		
-		# --- INTERROGATION PROTOCOL RESTORED ---
-		# Check if the object we hit is a Receiver!
+		# [THE RADAR INTERROGATION PATCH]
 		var target = ray.get_collider()
-		if target and target.has_method("hit_by_laser"):
-			target.hit_by_laser()
+		if target.has_method("hit_by_laser"):
+			target.hit_by_laser() # FIRE THE COMMAND!
+			
 	else:
 		line.add_point(ray.global_position + (aim_direction * LASER_RANGE))
 
