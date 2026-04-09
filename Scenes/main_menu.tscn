@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://5ksksiamkpl0"]
+
+[ext_resource type="Script" uid="uid://c0t5frj6r2is4" path="res://Scripts/main_menu.gd" id="1_28flt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_erv1k"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_28flt"]
+bg_color = Color(0.22670749, 0.22670749, 0.22670746, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="Main_Menu" type="Control" unique_id=1763137092]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_28flt")
+
+[node name="quit" type="Button" parent="." unique_id=1876388136]
+layout_mode = 0
+offset_left = 66.0
+offset_top = 494.0
+offset_right = 324.0
+offset_bottom = 566.0
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_28flt")
+text = "Quit
+"
+
+[node name="play" type="Button" parent="." unique_id=1683668055]
+layout_mode = 0
+offset_left = 824.0
+offset_top = 496.0
+offset_right = 1082.0
+offset_bottom = 568.0
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_erv1k")
+theme_override_styles/hover = SubResource("StyleBoxFlat_28flt")
+text = "Play
+"
+
+[connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="play" to="." method="_on_play_pressed"]
