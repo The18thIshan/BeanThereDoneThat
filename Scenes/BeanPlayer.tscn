@@ -34,4 +34,11 @@ texture = ExtResource("2_4go7o")
 shape = SubResource("CapsuleShape2D_ynouh")
 
 [node name="GroundRay" type="RayCast2D" parent="."]
+top_level = true
 target_position = Vector2(0, 500)
+
+[node name="LaserRay" type="RayCast2D" parent="."]
+top_level = true
+
+[node name="LaserLine" type="Line2D" parent="."]
+width = 4.0
