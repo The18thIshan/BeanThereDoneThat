@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cs4h3suuwlegd" path="res://Scripts/level_3.gd" id="1_76ybr"]
 [ext_resource type="Texture2D" uid="uid://dawj85cxb7sor" path="res://Assets/rock_cave_tileset_2Dpixel_catastrophicart.png" id="1_g5cw1"]
 [ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/player.tscn" id="2_76ybr"]
+[ext_resource type="PackedScene" path="res://Scenes/coin.tscn" id="4_s8nj6"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s8nj6"]
 texture = ExtResource("1_g5cw1")
@@ -858,5 +859,9 @@ position = Vector2(2, -3)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="transition_point" unique_id=345812071]
 position = Vector2(190, -81)
 shape = SubResource("RectangleShape2D_76ybr")
+
+[node name="Coin" parent="." unique_id=412534133 instance=ExtResource("4_s8nj6")]
+position = Vector2(85, -72)
+scale = Vector2(1.5, 1.5)
 
 [connection signal="body_entered" from="transition_point" to="." method="_on_transition_point_body_entered"]

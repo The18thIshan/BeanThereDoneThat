@@ -15,5 +15,5 @@ func _on_transition_point_body_entered(body) :
 func change_scene() -> void:
 	if Global.transition_scene == true:
 		Global.transition_scene = false
-		Global.current_scene = "victory_scene"
-		get_tree().change_scene_to_file("res://Scenes/victory_scene.tscn")
+		Global.current_scene = "end_screen"
+		get_tree().change_scene_to_file("res://Scenes/end_screen.tscn")

@@ -101,20 +101,44 @@ offset_right = 428.0
 offset_bottom = -75.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.84313726, 0, 1)
 theme_override_fonts/font = ExtResource("2_3j7m6")
 theme_override_font_sizes/font_size = 125
 text = "Level Completed "
 
 [node name="score" type="Label" parent="." unique_id=275367360]
-layout_mode = 0
-offset_left = 479.0
-offset_top = 292.0
-offset_right = 683.0
-offset_bottom = 433.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -30.0
+offset_right = 198.0
+offset_bottom = 137.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.63529414, 1, 0.92156863, 1)
 theme_override_fonts/font = ExtResource("2_3j7m6")
 theme_override_font_sizes/font_size = 68
-text = "Score : X
+text = "Total Coins : X
 "
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=145238399]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 48.0
+offset_right = 6.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.039215688, 0.09803922, 0.11764706, 1)
 
 [connection signal="pressed" from="Next" to="." method="_on_next_pressed"]
 [connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]
