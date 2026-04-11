@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://5ksksiamkpl0"]
 
 [ext_resource type="Script" uid="uid://c0t5frj6r2is4" path="res://Scripts/main_menu.gd" id="1_28flt"]
+[ext_resource type="Texture2D" uid="uid://d25kncxrnwe7b" path="res://Assets/assests/assessts/bats/BatZombie_Sheet.png" id="2_48xlc"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_erv1k"]
 bg_color = Color(0, 0, 0, 1)
@@ -16,6 +17,42 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ce3w2"]
+atlas = ExtResource("2_48xlc")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n45e2"]
+atlas = ExtResource("2_48xlc")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_opfnp"]
+atlas = ExtResource("2_48xlc")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cp0ys"]
+atlas = ExtResource("2_48xlc")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yhxw7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ce3w2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n45e2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_opfnp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cp0ys")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="Main_Menu" type="Control" unique_id=1763137092]
 layout_mode = 3
 anchors_preset = 15
@@ -26,11 +63,18 @@ grow_vertical = 2
 script = ExtResource("1_28flt")
 
 [node name="quit" type="Button" parent="." unique_id=1876388136]
-layout_mode = 0
-offset_left = 66.0
-offset_top = 494.0
-offset_right = 324.0
-offset_bottom = 566.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -129.0
+offset_top = 187.0
+offset_right = 129.0
+offset_bottom = 259.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -43,11 +87,18 @@ text = "Quit
 "
 
 [node name="play" type="Button" parent="." unique_id=1683668055]
-layout_mode = 0
-offset_left = 824.0
-offset_top = 496.0
-offset_right = 1082.0
-offset_bottom = 568.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -129.0
+offset_top = 94.0
+offset_right = 129.0
+offset_bottom = 166.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -58,6 +109,13 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_erv1k")
 theme_override_styles/hover = SubResource("StyleBoxFlat_28flt")
 text = "Play
 "
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=169312052]
+position = Vector2(95, 83.000015)
+scale = Vector2(11, 11)
+sprite_frames = SubResource("SpriteFrames_yhxw7")
+autoplay = "default"
+frame_progress = 0.65445906
 
 [connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]
 [connection signal="pressed" from="play" to="." method="_on_play_pressed"]
