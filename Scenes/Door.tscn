@@ -1,4 +1,4 @@
-[gd_scene load_steps=168 format=3 uid="uid://cu5pmqy8fl0fx"]
+[gd_scene load_steps=168 format=3 uid="uid://dnf6006hciect"]
 
 [ext_resource type="Texture2D" uid="uid://d1e1omjlc74i" path="res://Assets/LaserRed.png" id="1_38ogf"]
 [ext_resource type="Script" uid="uid://c122a7orsvehn" path="res://Scripts/door.gd" id="1_mw28t"]
@@ -575,7 +575,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"open",
-"speed": 40.0
+"speed": 60.0
 }]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_12e3s"]
@@ -1150,7 +1150,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"open",
-"speed": 40.0
+"speed": 60.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_oahd5"]
@@ -1169,11 +1169,9 @@ frame_progress = 1.0
 
 [node name="RightDoor" type="AnimatedSprite2D" parent="."]
 position = Vector2(240, -16)
-scale = Vector2(1, 0.5)
+scale = Vector2(0.9983818, 0.5)
 sprite_frames = SubResource("SpriteFrames_vc5gk")
 animation = &"open"
-frame = 80
-frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(160, -16)

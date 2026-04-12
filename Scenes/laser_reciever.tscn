@@ -1,11 +1,26 @@
-[gd_scene load_steps=4 format=3 uid="uid://bfxppx6w5wcd"]
+[gd_scene load_steps=7 format=3 uid="uid://ccmcdbupbo25e"]
 
 [ext_resource type="Script" uid="uid://bbu5bptl24dd7" path="res://Scripts/laser_reciever.gd" id="1_lj1v2"]
+[ext_resource type="Texture2D" uid="uid://dja0vyh7lh6dj" path="res://Assets/LaserButtonSheet.png" id="2_di7pu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d1usy"]
+atlas = ExtResource("2_di7pu")
+region = Rect2(0, 0, 160, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0m2de"]
+atlas = ExtResource("2_di7pu")
+region = Rect2(0, 32, 160, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_54vv7"]
 animations = [{
-"frames": [],
-"loop": true,
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d1usy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0m2de")
+}],
+"loop": false,
 "name": &"default",
 "speed": 120.0
 }]
@@ -17,7 +32,7 @@ size = Vector2(160, 32)
 script = ExtResource("1_lj1v2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(80, 0)
+position = Vector2(80, -16)
 sprite_frames = SubResource("SpriteFrames_54vv7")
 frame_progress = 1.0
 

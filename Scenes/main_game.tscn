@@ -1,11 +1,12 @@
-[gd_scene load_steps=7 format=3 uid="uid://dxgk18dll8s74"]
+[gd_scene load_steps=8 format=3 uid="uid://dxgk18dll8s74"]
 
+[ext_resource type="PackedScene" uid="uid://dlkl0sg2s3ed4" path="res://Scenes/Parallax.tscn" id="1_18r40"]
 [ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/BeanPlayer.tscn" id="1_l756w"]
 [ext_resource type="Script" uid="uid://macer6vn8y3o" path="res://camera_2d.gd" id="2_0e3vx"]
 [ext_resource type="PackedScene" uid="uid://d4gt364iqtqr0" path="res://Scenes/Levels/Level1.tscn" id="3_0e3vx"]
-[ext_resource type="PackedScene" uid="uid://bfxppx6w5wcd" path="res://Scenes/laser_reciever.tscn" id="4_6j5ir"]
-[ext_resource type="PackedScene" uid="uid://cu5pmqy8fl0fx" path="res://Scenes/Door.tscn" id="5_mgc0q"]
-[ext_resource type="PackedScene" uid="uid://b7mwx3tfgcywl" path="res://Scenes/BatEnemy.tscn" id="6_bb2iq"]
+[ext_resource type="PackedScene" uid="uid://ccmcdbupbo25e" path="res://Scenes/laser_reciever.tscn" id="4_6j5ir"]
+[ext_resource type="PackedScene" uid="uid://dnf6006hciect" path="res://Scenes/Door.tscn" id="5_mgc0q"]
+[ext_resource type="PackedScene" path="res://Scenes/BatEnemy.tscn" id="6_bb2iq"]
 
 [node name="MainGame" type="Node2D"]
 
@@ -24,13 +25,18 @@ script = ExtResource("2_0e3vx")
 position = Vector2(41, 9)
 
 [node name="LaserReciever" parent="." instance=ExtResource("4_6j5ir")]
-position = Vector2(1353, -295)
-
-[node name="AnimatableBody2D" parent="." instance=ExtResource("5_mgc0q")]
-position = Vector2(1849, 249)
-scale = Vector2(0.55, 1)
+position = Vector2(1354, -295)
 
 [node name="Node2D" parent="." instance=ExtResource("6_bb2iq")]
 position = Vector2(59.00003, -184.99998)
+
+[node name="AnimatableBody2D" parent="." instance=ExtResource("5_mgc0q")]
+position = Vector2(1849, 251)
+scale = Vector2(0.54901814, 1.0684253)
+
+[node name="Parallax" parent="." instance=ExtResource("1_18r40")]
+z_index = 1
+position = Vector2(777, -3079)
+scale = Vector2(2.0910428, 4.975591)
 
 [connection signal="powered_on" from="LaserReciever" to="AnimatableBody2D" method="open_door"]
