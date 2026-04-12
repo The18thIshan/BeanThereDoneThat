@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://bfxppx6w5wcd"]
+
+[ext_resource type="Script" uid="uid://bbu5bptl24dd7" path="res://Scripts/laser_reciever.gd" id="1_lj1v2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_54vv7"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 120.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lj1v2"]
+size = Vector2(160, 32)
+
+[node name="LaserReciever" type="StaticBody2D"]
+script = ExtResource("1_lj1v2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(80, 0)
+sprite_frames = SubResource("SpriteFrames_54vv7")
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(80, -16)
+shape = SubResource("RectangleShape2D_lj1v2")

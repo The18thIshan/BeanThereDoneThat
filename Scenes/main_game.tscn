@@ -1,18 +1,36 @@
-[gd_scene load_steps=4 format=3 uid="uid://dxgk18dll8s74"]
+[gd_scene load_steps=7 format=3 uid="uid://dxgk18dll8s74"]
 
 [ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/BeanPlayer.tscn" id="1_l756w"]
 [ext_resource type="Script" uid="uid://macer6vn8y3o" path="res://camera_2d.gd" id="2_0e3vx"]
-[ext_resource type="PackedScene" uid="uid://dh6fhfq4oq67v" path="res://Scenes/leveltrial.tscn" id="2_pu3va"]
+[ext_resource type="PackedScene" uid="uid://d4gt364iqtqr0" path="res://Scenes/Levels/Level1.tscn" id="3_0e3vx"]
+[ext_resource type="PackedScene" uid="uid://bfxppx6w5wcd" path="res://Scenes/laser_reciever.tscn" id="4_6j5ir"]
+[ext_resource type="PackedScene" uid="uid://cu5pmqy8fl0fx" path="res://Scenes/Door.tscn" id="5_mgc0q"]
+[ext_resource type="PackedScene" uid="uid://b7mwx3tfgcywl" path="res://Scenes/BatEnemy.tscn" id="6_bb2iq"]
 
 [node name="MainGame" type="Node2D"]
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("1_l756w")]
-position = Vector2(68.99988, -57.00006)
+position = Vector2(68.00001, -57)
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
-position = Vector2(-689.9987, 570.00055)
+position = Vector2(-709.99994, -1299.9999)
 scale = Vector2(9.999999, 9.999999)
+zoom = Vector2(0.6, 0.6)
+limit_bottom = 2000
 position_smoothing_enabled = true
 script = ExtResource("2_0e3vx")
 
-[node name="Leveltrial" parent="." instance=ExtResource("2_pu3va")]
+[node name="Level1" parent="." instance=ExtResource("3_0e3vx")]
+position = Vector2(41, 9)
+
+[node name="LaserReciever" parent="." instance=ExtResource("4_6j5ir")]
+position = Vector2(1353, -295)
+
+[node name="AnimatableBody2D" parent="." instance=ExtResource("5_mgc0q")]
+position = Vector2(1849, 249)
+scale = Vector2(0.55, 1)
+
+[node name="Node2D" parent="." instance=ExtResource("6_bb2iq")]
+position = Vector2(59.00003, -184.99998)
+
+[connection signal="powered_on" from="LaserReciever" to="AnimatableBody2D" method="open_door"]
