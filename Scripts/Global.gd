@@ -8,9 +8,11 @@ var next_scene_path = ""
 var transition_scene = false
 var total_score = 0
 var current_level_coins = 0
+var hoverrable: bool=false
 
-
-
+func _ready() -> void:
+	hoverrable = false
+	
 func update_paths():
 
 	current_level = "level_%s" % level_number

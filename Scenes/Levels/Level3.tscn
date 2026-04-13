@@ -1,9 +1,10 @@
-[gd_scene load_steps=183 format=4 uid="uid://c8gjyp2hbhgnj"]
+[gd_scene load_steps=184 format=4 uid="uid://c8gjyp2hbhgnj"]
 
 [ext_resource type="Texture2D" uid="uid://5bea1paebnyh" path="res://Assets/AllBlackTileSet.png" id="1_c01y6"]
 [ext_resource type="Script" uid="uid://cjrojiesw7hl5" path="res://Scenes/Levels/level_3.gd" id="1_d4xud"]
 [ext_resource type="Texture2D" uid="uid://dawj85cxb7sor" path="res://Assets/rock_cave_tileset_2Dpixel_catastrophicart.png" id="2_3gtua"]
 [ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/player.tscn" id="4_q5el5"]
+[ext_resource type="PackedScene" uid="uid://dlkl0sg2s3ed4" path="res://Scenes/ui/Parallax.tscn" id="5_q5el5"]
 [ext_resource type="Script" uid="uid://c122a7orsvehn" path="res://Scripts/objects/door.gd" id="5_t0ble"]
 [ext_resource type="Texture2D" uid="uid://d1e1omjlc74i" path="res://Assets/LaserRed.png" id="6_nvbyj"]
 [ext_resource type="Script" uid="uid://bbu5bptl24dd7" path="res://Scripts/objects/laser_reciever.gd" id="7_3i7ro"]
@@ -2270,9 +2271,15 @@ text = "Press S to Duck !"
 
 [node name="player" parent="." instance=ExtResource("4_q5el5")]
 position = Vector2(2001.9999, 169.99998)
+hover_unlocked = true
 
 [node name="Camera2D" type="Camera2D" parent="player"]
 position = Vector2(10.000975, -9.999901)
+zoom = Vector2(0.8, 0.8)
+
+[node name="Parallax" parent="player" instance=ExtResource("5_q5el5")]
+position = Vector2(2910.0012, -18240.002)
+scale = Vector2(30, 30)
 
 [node name="AnimatableBody2D" type="AnimatableBody2D" parent="."]
 position = Vector2(6453, 1114)
