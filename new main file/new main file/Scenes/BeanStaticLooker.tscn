@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://ciqv5go2rta2m"]
+
+[ext_resource type="Texture2D" uid="uid://cjootqt24oy4y" path="res://Assets/Bean Body.png" id="1_wu4fx"]
+[ext_resource type="Script" uid="uid://cthdo7lm0ibtr" path="res://Scripts/ui/BeanStaticEyes.gd" id="2_u3op3"]
+[ext_resource type="Texture2D" uid="uid://cwvslto7tjouy" path="res://Assets/Bean Eye64.png" id="3_2t4ru"]
+
+[node name="Node2D" type="Node2D" unique_id=1850446305]
+scale = Vector2(0.3, 0.3)
+
+[node name="Visuals" type="Node2D" parent="." unique_id=1068255897]
+
+[node name="BeanBody" type="Sprite2D" parent="Visuals" unique_id=798205206]
+position = Vector2(-4, 0)
+texture = ExtResource("1_wu4fx")
+
+[node name="Eyes" type="Node2D" parent="Visuals" unique_id=51500877]
+script = ExtResource("2_u3op3")
+
+[node name="RightEye" type="Sprite2D" parent="Visuals/Eyes" unique_id=1808425427]
+position = Vector2(192, -192)
+scale = Vector2(2, 2)
+texture = ExtResource("3_2t4ru")
+
+[node name="LeftEye" type="Sprite2D" parent="Visuals/Eyes" unique_id=871483408]
+position = Vector2(64, -192)
+scale = Vector2(2, 2)
+texture = ExtResource("3_2t4ru")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1147382173]
+limit_left = -1920
+limit_top = -1080
+limit_right = 1920
+limit_bottom = 1080

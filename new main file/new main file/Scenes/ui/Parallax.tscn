@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://dlkl0sg2s3ed4"]
+
+[ext_resource type="Texture2D" uid="uid://fisxmhls7cxw" path="res://Assets/Kushalparallax.png" id="1_j7oka"]
+
+[node name="Parallax" type="Node2D"]
+
+[node name="Parallax2D" type="Parallax2D" parent="."]
+z_index = -10
+scroll_scale = Vector2(0.7, 0.7)
+repeat_size = Vector2(7679, 0)
+repeat_times = 10
+
+[node name="Sprite2D" type="Sprite2D" parent="Parallax2D"]
+texture = ExtResource("1_j7oka")
+centered = false
+
+[node name="Sprite2D2" type="Sprite2D" parent="Parallax2D"]
+texture = ExtResource("1_j7oka")
+centered = false
+offset = Vector2(3839, 0)
+flip_h = true
