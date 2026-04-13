@@ -45,3 +45,7 @@ func close_door():
 		
 		# [THE PHYSICS BYPASS]: Safely turn the collision block back on!
 		collision_shape.set_deferred("disabled", false)
+
+
+func _on_laser_reciever_powered_on() -> void:
+	pass # Replace with function body.

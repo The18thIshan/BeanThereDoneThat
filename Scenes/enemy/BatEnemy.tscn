@@ -1,6 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://b7mwx3tfgcywl"]
+[gd_scene format=3 uid="uid://b7mwx3tfgcywl"]
 
-[ext_resource type="Script" uid="uid://cvqsihcmeujsw" path="res://Scripts/bat_enemy.gd" id="1_ew0y8"]
+[ext_resource type="Script" uid="uid://cvqsihcmeujsw" path="res://Scripts/enemy/bat_enemy.gd" id="1_ew0y8"]
 [ext_resource type="Texture2D" uid="uid://d25kncxrnwe7b" path="res://Assets/assests/assessts/bats/BatZombie_Sheet.png" id="2_40kae"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l1gpn"]

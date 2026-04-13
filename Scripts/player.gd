@@ -36,15 +36,17 @@ const BLINK_VARIANCE  = 2.0
 const CAPSULE_RADIUS: float = 30.0
 const CAPSULE_HEIGHT: float = 97.4
 
-# --- WEAPONRY CONSTANTS (SEMI-AUTO) ---
+# --- WEAPONRY CONSTANTS (FIXED HULL CANNONS) ---
 const LASER_RANGE = 1500.0
-const LASER_COOLDOWN = 0.6  # Heat sink refresh rate
-const LASER_DURATION = 0.15 # Beam visual flash duration
+const LASER_COOLDOWN = 0.6  
+const LASER_DURATION = 0.15 
 
 # --- CAMERA CONSTANTS ---
 const CAM_LOOK_AHEAD = 250.0     
 const CAM_SMOOTHING  = 3.0       
 const CAM_IDLE_FRACTION = 0.5   
+const CAM_PEEK_MAX = 600.0       
+const CAM_PEEK_SMOOTHING = 5.0   
 
 # ==========================================
 # --- HARDWARE REFERENCES ---
@@ -58,10 +60,11 @@ const CAM_IDLE_FRACTION = 0.5
 @onready var collision_shape = $CollisionShape2D 
 
 # --- TWIN-LINKED OPTICS ---
-@onready var laser_ray_R     = $LaserRayRight
-@onready var laser_line_R    = $LaserLineRight
-@onready var laser_ray_L     = $LaserRayLeft
-@onready var laser_line_L    = $LaserLineLeft
+# Make sure these are children of the Visuals node in your scene!
+@onready var laser_ray_R     = $Visuals/LaserRayRight
+@onready var laser_line_R    = $Visuals/LaserLineRight
+@onready var laser_ray_L     = $Visuals/LaserRayLeft
+@onready var laser_line_L    = $Visuals/LaserLineLeft
 
 # ==========================================
 # --- INTERNAL MEMORY ---
@@ -88,27 +91,23 @@ var trigger_reset = true
 var debug_timer = 0.0 
 
 func _ready():
-	print("--- SARGE'S UNIFIED MASTER BOOT SEQUENCE ---")
+	print("--- UNIFIED MASTER BOOT SEQUENCE ---")
 	
-	# --- RADAR CALIBRATION (THE ANTI-FLYING FIX) ---
+	# --- RADAR CALIBRATION ---
 	ground_ray.enabled = true
 	ground_ray.collision_mask = self.collision_mask 
 	ground_ray.target_position = Vector2(0, 2000)
-	ground_ray.hit_from_inside = false # CRITICAL: Do not read internal geometry!
-	ground_ray.add_exception(self)     # CRITICAL: Ignore the Bean's own physical hull!
+	ground_ray.hit_from_inside = false 
+	ground_ray.add_exception(self)     
 	
 	# --- TWIN WEAPONS OVERRIDE ---
-	laser_ray_R.top_level = true
 	laser_line_R.top_level = true
 	laser_line_R.global_position = Vector2.ZERO 
 	
-	laser_ray_L.top_level = true
 	laser_line_L.top_level = true
 	laser_line_L.global_position = Vector2.ZERO 
 	
 	# --- FRIENDLY FIRE OVERRIDE ---
-	laser_ray_R.add_exception(self)
-	laser_ray_L.add_exception(self)
 		
 	right_eye_origin   = right_eye.position
 	left_eye_origin    = left_eye.position
@@ -121,7 +120,7 @@ func _physics_process(delta):
 	# --- DIAGNOSTIC TELEMETRY ---
 	debug_timer += delta
 	var do_print = false
-	if debug_timer >= 0.5:
+	if debug_timer >= 5:
 		do_print = true
 		debug_timer = 0.0
 		print("\n--- TACTICAL TELEMETRY ---")
@@ -131,7 +130,6 @@ func _physics_process(delta):
 	else:
 		gravity = GRAVITY
 		
-
 	var is_detecting_ground = ground_ray.is_colliding()
 	ground_ray.position.x = self.position.x 
 	ground_ray.position.y = self.position.y
@@ -225,9 +223,8 @@ func _update_visuals(delta):
 	_update_eye(right_eye, right_eye_origin, mouse_pos, inside, delta)
 	_update_eye(left_eye,  left_eye_origin,  mouse_pos, inside, delta)
 
-
 # ==========================================
-# --- WEAPONS SUBSYSTEM (BURST LASERS) ---
+# --- WEAPONS SUBSYSTEM (PURE MATH OPTICS) ---
 # ==========================================
 func _tick_weapons(delta):
 	if laser_cooldown_timer > 0.0:
@@ -236,8 +233,9 @@ func _tick_weapons(delta):
 	if laser_duration_timer > 0.0:
 		laser_duration_timer -= delta
 		var mouse_pos = get_global_mouse_position()
-		_process_beam(laser_ray_R, laser_line_R, right_eye, mouse_pos)
-		_process_beam(laser_ray_L, laser_line_L, left_eye, mouse_pos)
+		# We pass the Line2D and the Sprite2D. No RayCast nodes required!
+		_process_beam(laser_line_R, right_eye, mouse_pos)
+		_process_beam(laser_line_L, left_eye, mouse_pos)
 	else:
 		laser_line_R.visible = false
 		laser_line_L.visible = false
@@ -252,41 +250,60 @@ func _tick_weapons(delta):
 		
 		laser_line_R.visible = true
 		laser_line_L.visible = true
-		print(">> WEAPONS: Semi-Auto Burst Discharged!")
+		print(">> WEAPONS: Anti-Ghost Beams Discharged!")
 
-func _process_beam(ray: RayCast2D, line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
-	ray.global_position = eye_sprite.global_position
-	var aim_direction = (target_pos - ray.global_position).normalized()
+func _process_beam(line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
+	# 1. Establish firing coordinates
+	var start_pos = eye_sprite.global_position
+	var aim_direction = (target_pos - start_pos).normalized()
+	var end_pos = start_pos + (aim_direction * LASER_RANGE)
 	
-	ray.target_position = aim_direction * LASER_RANGE
-	ray.force_raycast_update() 
+	# 2. CALL THE PHYSICS GODS DIRECTLY
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(start_pos, end_pos)
+	query.exclude = [self] # Tell the ray to ignore our own Bean's hull!
 	
+	# Execute the instant scan!
+	var hit_data = space_state.intersect_ray(query)
+	
+	# 3. Paint the beam
 	line.clear_points()
-	line.add_point(ray.global_position)
+	line.add_point(start_pos)
 	
-	if ray.is_colliding():
-		# Stop at impact
-		line.add_point(ray.get_collision_point())
+	if hit_data:
+		# hit_data is a Dictionary containing the exact impact coordinates and the object hit
+		line.add_point(hit_data.position)
 		
-		# [THE RADAR INTERROGATION PATCH]
-		var target = ray.get_collider()
+		var target = hit_data.collider
 		if target.has_method("hit_by_laser"):
-			target.hit_by_laser() # FIRE THE COMMAND!
-			
+			target.hit_by_laser()
 	else:
-		line.add_point(ray.global_position + (aim_direction * LASER_RANGE))
+		line.add_point(end_pos)
 
 # ==========================================
 # --- UTILITY SUBSYSTEMS ---
 # ==========================================
 func _update_camera(delta):
-	var move_dir = Input.get_axis("ui_left", "ui_right")
-	if move_dir != 0:
-		facing_direction = sign(move_dir) 
-		target_cam_offset = facing_direction * CAM_LOOK_AHEAD
+	if camera == null:
+		return
+		
+	# --- TACTICAL FREE-LOOK OVERRIDE ---
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		var local_mouse = get_local_mouse_position()
+		var peek_target = local_mouse.limit_length(CAM_PEEK_MAX)
+		camera.offset = camera.offset.lerp(peek_target, CAM_PEEK_SMOOTHING * delta)
+		
+	# --- STANDARD AUTO-FOLLOW MODE ---
 	else:
-		target_cam_offset = facing_direction * (CAM_LOOK_AHEAD * CAM_IDLE_FRACTION)
-	camera.offset.x = lerp(camera.offset.x, target_cam_offset, CAM_SMOOTHING * delta)
+		var move_dir = Input.get_axis("ui_left", "ui_right")
+		if move_dir != 0:
+			facing_direction = sign(move_dir) 
+			target_cam_offset = facing_direction * CAM_LOOK_AHEAD
+		else:
+			target_cam_offset = facing_direction * (CAM_LOOK_AHEAD * CAM_IDLE_FRACTION)
+			
+		var standard_target = Vector2(target_cam_offset, 0.0)
+		camera.offset = camera.offset.lerp(standard_target, CAM_SMOOTHING * delta)
 
 func _tick_blink(delta):
 	blink_timer += delta
@@ -319,3 +336,7 @@ func _is_inside_capsule(mouse_global: Vector2) -> bool:
 	var half_body = (CAPSULE_HEIGHT / 2.0) - CAPSULE_RADIUS
 	var nearest   = Vector2(0.0, clamp(local.y, -half_body, half_body))
 	return local.distance_to(nearest) <= CAPSULE_RADIUS
+	
+func player():
+	pass
+	

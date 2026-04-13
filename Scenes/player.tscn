@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://bl0k7x6j5jn83"]
+
+[ext_resource type="Texture2D" uid="uid://cjootqt24oy4y" path="res://Assets/Bean Body.png" id="1_4go1p"]
+[ext_resource type="Script" uid="uid://csxrs26neab2e" path="res://Scripts/player.gd" id="1_4go7o"]
+[ext_resource type="Texture2D" uid="uid://cwvslto7tjouy" path="res://Assets/Bean Eye64.png" id="2_4go7o"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ynouh"]
+radius = 300.0
+height = 974.0
+
+[node name="player" type="CharacterBody2D" unique_id=1265160510 groups=["player"]]
+scale = Vector2(0.1, 0.1)
+script = ExtResource("1_4go7o")
+
+[node name="GroundRay" type="RayCast2D" parent="." unique_id=1528729389]
+top_level = true
+target_position = Vector2(0, 500)
+
+[node name="Visuals" type="Node2D" parent="." unique_id=449200364]
+
+[node name="LaserLineRight" type="Line2D" parent="Visuals" unique_id=1005357188]
+scale = Vector2(0.99999976, 0.99999976)
+width = 4.0
+default_color = Color(1, 0, 0, 1)
+
+[node name="LaserLineLeft" type="Line2D" parent="Visuals" unique_id=877141479]
+scale = Vector2(0.99999976, 0.99999976)
+width = 4.0
+default_color = Color(1, 0, 0, 1)
+
+[node name="BeanBody" type="Sprite2D" parent="Visuals" unique_id=954195563]
+position = Vector2(-4, 0)
+texture = ExtResource("1_4go1p")
+
+[node name="Eyes" type="Node2D" parent="Visuals" unique_id=1267430675]
+
+[node name="Sprite2D" type="Sprite2D" parent="Visuals/Eyes" unique_id=403654009]
+position = Vector2(192, -192)
+scale = Vector2(2, 2)
+texture = ExtResource("2_4go7o")
+
+[node name="Sprite2D2" type="Sprite2D" parent="Visuals/Eyes" unique_id=960218723]
+position = Vector2(64, -192)
+scale = Vector2(2, 2)
+texture = ExtResource("2_4go7o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1382522807]
+visible = false
+shape = SubResource("CapsuleShape2D_ynouh")

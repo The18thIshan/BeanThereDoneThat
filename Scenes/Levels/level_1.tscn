@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://dxgk18dll8s74"]
+
+[ext_resource type="Script" uid="uid://l35g63271s35" path="res://Scripts/level/level_1.gd" id="1_5f3p6"]
+[ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/player.tscn" id="1_xgxfi"]
+[ext_resource type="PackedScene" uid="uid://d4gt364iqtqr0" path="res://Scenes/map/Level1.tscn" id="2_5f3p6"]
+[ext_resource type="PackedScene" uid="uid://ccmcdbupbo25e" path="res://Scenes/objects/laser_reciever.tscn" id="3_jv26f"]
+[ext_resource type="PackedScene" uid="uid://b7mwx3tfgcywl" path="res://Scenes/enemy/BatEnemy.tscn" id="4_rb0md"]
+[ext_resource type="PackedScene" uid="uid://dnf6006hciect" path="res://Scenes/objects/Door.tscn" id="5_u5ghp"]
+[ext_resource type="PackedScene" uid="uid://dlkl0sg2s3ed4" path="res://Scenes/ui/Parallax.tscn" id="6_hwvp3"]
+
+[sub_resource type="GDScript" id="GDScript_bb2iq"]
+script/source = "extends Camera2D
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jv26f"]
+size = Vector2(192, 20)
+
+[node name="level_1" type="Node2D" unique_id=1185874482]
+script = ExtResource("1_5f3p6")
+
+[node name="player" parent="." unique_id=184317524 instance=ExtResource("1_xgxfi")]
+position = Vector2(68.00001, -57)
+
+[node name="Camera2D" type="Camera2D" parent="player" unique_id=1942347475]
+position = Vector2(-709.99994, -1299.9999)
+scale = Vector2(9.999999, 9.999999)
+zoom = Vector2(0.6, 0.6)
+limit_bottom = 2000
+position_smoothing_enabled = true
+script = SubResource("GDScript_bb2iq")
+
+[node name="Level1" parent="." unique_id=320730225 instance=ExtResource("2_5f3p6")]
+position = Vector2(41, 9)
+
+[node name="LaserReciever" parent="." unique_id=1142495158 instance=ExtResource("3_jv26f")]
+position = Vector2(1354, -295)
+
+[node name="Node2D" parent="." unique_id=1362549739 instance=ExtResource("4_rb0md")]
+position = Vector2(59.00003, -184.99998)
+
+[node name="AnimatableBody2D" parent="." unique_id=1863579896 instance=ExtResource("5_u5ghp")]
+position = Vector2(1849, 251)
+scale = Vector2(0.54901814, 1.0684253)
+
+[node name="Parallax" parent="." unique_id=1110022850 instance=ExtResource("6_hwvp3")]
+z_index = 1
+position = Vector2(777, -3079)
+scale = Vector2(2.0910428, 4.975591)
+
+[node name="transition" type="Area2D" parent="." unique_id=402127222]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="transition" unique_id=2146915821]
+position = Vector2(2857, 2164)
+shape = SubResource("RectangleShape2D_jv26f")
+
+[connection signal="powered_on" from="LaserReciever" to="AnimatableBody2D" method="open_door"]
+[connection signal="body_entered" from="transition" to="." method="_on_transition_body_entered"]

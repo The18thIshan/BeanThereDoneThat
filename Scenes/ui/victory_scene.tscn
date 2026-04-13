@@ -1,0 +1,144 @@
+[gd_scene format=3 uid="uid://c4bac3at8owwu"]
+
+[ext_resource type="Script" uid="uid://mtj85i6rev6h" path="res://Scripts/ui/victory_scene.gd" id="1_w3pyd"]
+[ext_resource type="FontFile" uid="uid://bhwitepo8wqy4" path="res://Assets/font/coolvetica/Coolvetica Rg It.otf" id="2_3j7m6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2dgqi"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ua315"]
+bg_color = Color(0.22670749, 0.22670749, 0.22670746, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mmxu7"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w3pyd"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3j7m6"]
+bg_color = Color(0.37665835, 0.37665853, 0.3766584, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="Victory_Scene" type="Control" unique_id=1888453813]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -6.0
+offset_top = -48.0
+offset_right = -6.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_w3pyd")
+
+[node name="completed" type="Label" parent="." unique_id=1289129699]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -402.0
+offset_top = -212.0
+offset_right = 428.0
+offset_bottom = -75.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.84313726, 0, 1)
+theme_override_fonts/font = ExtResource("2_3j7m6")
+theme_override_font_sizes/font_size = 125
+text = "Level Completed "
+
+[node name="score" type="Label" parent="." unique_id=275367360]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -30.0
+offset_right = 198.0
+offset_bottom = 137.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.63529414, 1, 0.92156863, 1)
+theme_override_fonts/font = ExtResource("2_3j7m6")
+theme_override_font_sizes/font_size = 68
+text = "Total Coins : X
+"
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=145238399]
+z_index = -1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = 45.0
+offset_right = -4.0
+offset_bottom = 45.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.039215688, 0.09803922, 0.11764706, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=335184762]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -836.0
+offset_top = -321.0
+offset_right = 825.0
+offset_bottom = -250.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 1000
+
+[node name="quit" type="Button" parent="HBoxContainer" unique_id=691938453]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_2dgqi")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxFlat_2dgqi")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2dgqi")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ua315")
+text = "Quit
+"
+
+[node name="Next" type="Button" parent="HBoxContainer" unique_id=768353876]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_mmxu7")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_w3pyd")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3j7m6")
+text = "Next
+"
+
+[connection signal="pressed" from="HBoxContainer/quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="HBoxContainer/Next" to="." method="_on_next_pressed"]
