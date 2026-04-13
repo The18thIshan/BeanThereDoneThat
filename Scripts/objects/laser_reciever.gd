@@ -1,51 +1,64 @@
 extends StaticBody2D
 
 # --- THE SIGNALS ---
-# You will connect these to your doors, platforms, or elevators in the Godot Editor!
 signal powered_on
-signal powered_off
+
+# --- ENGINEERING PARAMETERS ---
+const CHARGE_TIME = 0.5 # Seconds required to permanently activate
+
+# --- HARDWARE REFERENCES ---
+@onready var progress_bar: ProgressBar = $ProgressBar
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 # --- INTERNAL MEMORY ---
+var current_charge: float = 0.0
 var is_powered: bool = false
-var flag: int = false
-var power_timeout: float = 0.0
-@onready var animated_sprite_2d: AnimatedSprite2D = $AnimatedSprite2D
-
+var contact_timeout: float = 0.0
 
 func _ready():
-	print("RECEIVER OFFLINE. Awaiting Laser Link.")
-	#modulate = Color.DARK_RED # Visual offline state
+	print("RECEIVER: Capacitor offline. Awaiting charge.")
+	
+	# Calibrate the visual UI gauge
+	progress_bar.max_value = CHARGE_TIME
+	progress_bar.value = 0.0
 
 func _process(delta):
-	pass
-	# If the receiver is powered, it constantly burns down a timer.
-	# The laser MUST keep hitting it to keep the timer full!
+	# 1. PERMANENT POWER OVERRIDE
+	# If the receiver is already fully activated, stop doing math!
 	if is_powered:
+		return
+
+	# 2. THE CHARGING SEQUENCE
+	if contact_timeout > 0.0:
+		# The laser is hitting us! Fill the battery.
+		contact_timeout -= delta
+		current_charge += delta
+	else:
+		# The laser missed! Drain the battery.
+		current_charge -= delta
+
+	# 3. CAPACITOR LIMITS
+	# Keep the charge exactly between 0.0 and our max CHARGE_TIME
+	current_charge = clamp(current_charge, 0.0, CHARGE_TIME)
+	progress_bar.value = current_charge
+
+	# 4. THE ACTIVATION THRESHOLD
+	if current_charge >= CHARGE_TIME:
+		is_powered = true
+		progress_bar.value = CHARGE_TIME # Lock visual bar to full
+		
+		# Play the animation and send the signal EXACTLY ONCE
+		animated_sprite.play()
 		powered_on.emit()
-		#power_timeout -= delta
-		#if power_timeout <= 0.0:
-			## The laser stopped hitting us! SHUT IT DOWN!
-			#is_powered = false
-			##modulate = Color.DARK_RED 
-			#powered_off.emit()
-			#print("RECEIVER: Link Severed. Power Lost.")
+		print("RECEIVER: Capacitor Full! Permanent Activation!")
 
 # ==========================================
 # --- THE IMPACT RECEPTOR ---
 # ==========================================
-# The Bean's laser will call this EXACT function!
 func hit_by_laser():
-	# Refill the battery! As long as the laser is touching, this stays above 0.
-	
-	if is_powered == false:
-		animated_sprite_2d.play()
-		is_powered = true
-	else:
-		pass
-	
-	# If we were previously asleep, WAKE UP and emit the signal ONE TIME!
-	#if not is_powered:
-		#is_powered = true
-		#modulate = Color.CYAN # Visual online state
-		#powered_on.emit()
-		#print("RECEIVER: Power Overwhelming! Signal Sent!")
+	# If the switch is already permanently on, ignore the laser completely.
+	if is_powered:
+		return
+		
+	# The laser is touching! Give it a tiny grace period before it starts draining.
+	contact_timeout = 0.05

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://ccmcdbupbo25e"]
+[gd_scene load_steps=9 format=3 uid="uid://ccmcdbupbo25e"]
 
 [ext_resource type="Script" uid="uid://bbu5bptl24dd7" path="res://Scripts/objects/laser_reciever.gd" id="1_lj1v2"]
 [ext_resource type="Texture2D" uid="uid://dja0vyh7lh6dj" path="res://Assets/LaserButtonSheet.png" id="2_di7pu"]
@@ -28,6 +28,20 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lj1v2"]
 size = Vector2(160, 32)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4un24"]
+bg_color = Color(1, 0, 0, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mojil"]
+bg_color = Color(0, 0.7882353, 0.28235295, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="LaserReciever" type="StaticBody2D"]
 script = ExtResource("1_lj1v2")
 
@@ -39,3 +53,11 @@ frame_progress = 1.0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(80, -16)
 shape = SubResource("RectangleShape2D_lj1v2")
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+offset_left = 149.0
+offset_top = -10.0
+offset_right = 185.0
+theme_override_styles/background = SubResource("StyleBoxFlat_4un24")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mojil")
+show_percentage = false

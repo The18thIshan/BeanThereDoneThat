@@ -37,9 +37,10 @@ const CAPSULE_RADIUS: float = 30.0
 const CAPSULE_HEIGHT: float = 97.4
 
 # --- WEAPONRY CONSTANTS (FIXED HULL CANNONS) ---
-const LASER_RANGE = 1500.0
+const LASER_RANGE = 5000.0
 const LASER_COOLDOWN = 0.6  
-const LASER_DURATION = 0.15 
+const LASER_DURATION = 10 
+const MAX_BOUNCES = 3 # Increase this if you want absolute chaos
 
 # --- CAMERA CONSTANTS ---
 const CAM_LOOK_AHEAD = 250.0     
@@ -253,32 +254,39 @@ func _tick_weapons(delta):
 		print(">> WEAPONS: Anti-Ghost Beams Discharged!")
 
 func _process_beam(line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
-	# 1. Establish firing coordinates
+	# 1. Establish initial firing coordinates
 	var start_pos = eye_sprite.global_position
 	var aim_direction = (target_pos - start_pos).normalized()
-	var end_pos = start_pos + (aim_direction * LASER_RANGE)
+	var distance_remaining = LASER_RANGE
 	
-	# 2. CALL THE PHYSICS GODS DIRECTLY
+	# 2. Fire the primary physics ray
 	var space_state = get_world_2d().direct_space_state
-	var query = PhysicsRayQueryParameters2D.create(start_pos, end_pos)
-	query.exclude = [self] # Tell the ray to ignore our own Bean's hull!
+	var query = PhysicsRayQueryParameters2D.create(start_pos, start_pos + (aim_direction * distance_remaining))
+	query.exclude = [self]
 	
-	# Execute the instant scan!
 	var hit_data = space_state.intersect_ray(query)
 	
-	# 3. Paint the beam
+	# 3. Anchor the start of the visual beam
 	line.clear_points()
 	line.add_point(start_pos)
 	
 	if hit_data:
-		# hit_data is a Dictionary containing the exact impact coordinates and the object hit
-		line.add_point(hit_data.position)
+		var hit_pos = hit_data.position
+		line.add_point(hit_pos)
 		
 		var target = hit_data.collider
+		
 		if target.has_method("hit_by_laser"):
 			target.hit_by_laser()
+			
+		# [THE DELEGATION PROTOCOL]
+		# If the target is a mirror, hand over the line and the math!
+		if target.has_method("reflect_beam"):
+			var new_dist = distance_remaining - start_pos.distance_to(hit_pos)
+			target.reflect_beam(line, hit_pos, aim_direction, hit_data.normal, new_dist, 1)
+			
 	else:
-		line.add_point(end_pos)
+		line.add_point(start_pos + (aim_direction * distance_remaining))
 
 # ==========================================
 # --- UTILITY SUBSYSTEMS ---

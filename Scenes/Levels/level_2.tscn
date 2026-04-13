@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cqjajwyvhtyjm"]
+[gd_scene load_steps=0 format=3 uid="uid://cqjajwyvhtyjm"]
 
 [ext_resource type="Script" uid="uid://dg678vjchj8k8" path="res://Scripts/level/level_2.gd" id="1_12fag"]
 [ext_resource type="Texture2D" uid="uid://dawj85cxb7sor" path="res://Assets/rock_cave_tileset_2Dpixel_catastrophicart.png" id="1_smnlx"]
