@@ -4,7 +4,7 @@ extends StaticBody2D
 signal powered_on
 
 # --- ENGINEERING PARAMETERS ---
-const CHARGE_TIME = 0.5 # Seconds required to permanently activate
+@export var CHARGE_TIME = 0.5 # Seconds required to permanently activate
 
 # --- HARDWARE REFERENCES ---
 @onready var progress_bar: ProgressBar = $ProgressBar

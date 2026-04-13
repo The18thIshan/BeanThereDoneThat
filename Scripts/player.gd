@@ -36,11 +36,22 @@ const BLINK_VARIANCE  = 2.0
 const CAPSULE_RADIUS: float = 30.0
 const CAPSULE_HEIGHT: float = 97.4
 
-# --- WEAPONRY CONSTANTS (FIXED HULL CANNONS) ---
+# --- WEAPONRY CONSTANTS (HEAVY PLASMA UPGRADE) ---
 const LASER_RANGE = 5000.0
 const LASER_COOLDOWN = 0.6  
-const LASER_DURATION = 10 
-const MAX_BOUNCES = 3 # Increase this if you want absolute chaos
+const LASER_DURATION = 1   # Increased so the beam has time to travel!
+const CHARGE_TIME = 0.2    # 0.1s wind-up before firing
+const BEAM_SPEED = 2000.0    # How fast the laser travels across the screen
+
+# --- WEAPON TIMERS & MEMORY ---
+var laser_cooldown_timer = 0.0
+var laser_duration_timer = 0.0
+var trigger_reset = true 
+
+# NEW: The State Machine
+var weapon_state = "IDLE"    # Can be "IDLE", "CHARGING", or "FIRING"
+var charge_timer = 0.0
+var current_beam_length = 0.0
 
 # --- CAMERA CONSTANTS ---
 const CAM_LOOK_AHEAD = 250.0     
@@ -82,11 +93,6 @@ var target_cam_offset   = 0.0
 var facing_direction    = 1.0 
 var current_hover_target = BASE_HOVER_HEIGHT
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
-
-# --- WEAPON TIMERS ---
-var laser_cooldown_timer = 0.0
-var laser_duration_timer = 0.0
-var trigger_reset = true 
 
 # --- OBSERVABILITY ---
 var debug_timer = 0.0 
@@ -224,40 +230,88 @@ func _update_visuals(delta):
 	_update_eye(right_eye, right_eye_origin, mouse_pos, inside, delta)
 	_update_eye(left_eye,  left_eye_origin,  mouse_pos, inside, delta)
 
-# ==========================================
-# --- WEAPONS SUBSYSTEM (PURE MATH OPTICS) ---
+## ==========================================
+# --- WEAPONS SUBSYSTEM (DYNAMIC GROWTH RAY) ---
 # ==========================================
 func _tick_weapons(delta):
+	# 1. HEAT SINK COOLING
 	if laser_cooldown_timer > 0.0:
 		laser_cooldown_timer -= delta
-		
-	if laser_duration_timer > 0.0:
-		laser_duration_timer -= delta
-		var mouse_pos = get_global_mouse_position()
-		# We pass the Line2D and the Sprite2D. No RayCast nodes required!
-		_process_beam(laser_line_R, right_eye, mouse_pos)
-		_process_beam(laser_line_L, left_eye, mouse_pos)
-	else:
-		laser_line_R.visible = false
-		laser_line_L.visible = false
 
-	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		trigger_reset = true
-
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and laser_cooldown_timer <= 0.0 and trigger_reset:
-		laser_cooldown_timer = LASER_COOLDOWN
-		laser_duration_timer = LASER_DURATION
+	# 2. TRIGGER PULLED (START CHARGE)
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and laser_cooldown_timer <= 0.0 and weapon_state == "IDLE" and trigger_reset:
+		weapon_state = "CHARGING"
+		charge_timer = CHARGE_TIME
 		trigger_reset = false 
 		
-		laser_line_R.visible = true
-		laser_line_L.visible = true
-		print(">> WEAPONS: Anti-Ghost Beams Discharged!")
+		# Turn the emitters angry red!
+		right_eye.modulate = Color.RED
+		left_eye.modulate = Color.RED
+		print(">> WEAPONS: Plasma Emitters Charging...")
 
-func _process_beam(line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
+	# 3. CHARGING PHASE
+	if weapon_state == "CHARGING":
+		charge_timer -= delta
+		if charge_timer <= 0.0:
+			# Charge complete! Enter firing mode!
+			weapon_state = "FIRING"
+			laser_duration_timer = LASER_DURATION
+			current_beam_length = 0.0 # Start the beam at length 0!
+			
+			laser_line_R.visible = true
+			laser_line_L.visible = true
+			print(">> WEAPONS: BOOM! Beam unfurling!")
+			
+			# Emitters turn super-hot Cyan while discharging!
+			right_eye.modulate = Color.CYAN
+			left_eye.modulate = Color.CYAN
+
+	# 4. FIRING PHASE
+	
+	elif weapon_state == "FIRING":
+		laser_duration_timer -= delta
+		right_eye.modulate = Color.RED
+		left_eye.modulate = Color.RED
+		
+		# GROW THE BEAM MATHEMATICALLY!
+		current_beam_length += BEAM_SPEED * delta
+		if current_beam_length > LASER_RANGE:
+			current_beam_length = LASER_RANGE # Cap it at max range
+			
+		var mouse_pos = get_global_mouse_position()
+		
+		# Notice we now pass 'current_beam_length' into the processor!
+		_process_beam(laser_line_R, right_eye, mouse_pos, current_beam_length)
+		_process_beam(laser_line_L, left_eye, mouse_pos, current_beam_length)
+		
+		# Stop firing if duration ends OR if player lets go of the mouse!
+		if laser_duration_timer <= 0.0 or not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			_shut_down_weapons()
+
+	# 5. TRIGGER DISCONNECT & CANCEL
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		trigger_reset = true
+		if weapon_state == "CHARGING":
+			# They let go of the trigger before the charge finished! Cancel it!
+			_shut_down_weapons()
+
+func _shut_down_weapons():
+	weapon_state = "IDLE"
+	laser_line_R.visible = false
+	laser_line_L.visible = false
+	laser_cooldown_timer = LASER_COOLDOWN
+	
+	# Reset the eyes back to normal white!
+	right_eye.modulate = Color.WHITE
+	left_eye.modulate = Color.WHITE
+
+func _process_beam(line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2, current_length: float):
 	# 1. Establish initial firing coordinates
 	var start_pos = eye_sprite.global_position
 	var aim_direction = (target_pos - start_pos).normalized()
-	var distance_remaining = LASER_RANGE
+	
+	# THE MAGIC SAUCE: The beam only calculates physics up to its current length!
+	var distance_remaining = current_length 
 	
 	# 2. Fire the primary physics ray
 	var space_state = get_world_2d().direct_space_state
@@ -275,12 +329,10 @@ func _process_beam(line: Line2D, eye_sprite: Sprite2D, target_pos: Vector2):
 		line.add_point(hit_pos)
 		
 		var target = hit_data.collider
-		
 		if target.has_method("hit_by_laser"):
 			target.hit_by_laser()
 			
 		# [THE DELEGATION PROTOCOL]
-		# If the target is a mirror, hand over the line and the math!
 		if target.has_method("reflect_beam"):
 			var new_dist = distance_remaining - start_pos.distance_to(hit_pos)
 			target.reflect_beam(line, hit_pos, aim_direction, hit_data.normal, new_dist, 1)

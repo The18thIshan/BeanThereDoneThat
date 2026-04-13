@@ -1,8 +1,8 @@
-[gd_scene load_steps=0 format=3 uid="uid://cqjajwyvhtyjm"]
+[gd_scene load_steps=8 format=3 uid="uid://cqjajwyvhtyjm"]
 
 [ext_resource type="Script" uid="uid://dg678vjchj8k8" path="res://Scripts/level/level_2.gd" id="1_12fag"]
 [ext_resource type="Texture2D" uid="uid://dawj85cxb7sor" path="res://Assets/rock_cave_tileset_2Dpixel_catastrophicart.png" id="1_smnlx"]
-[ext_resource type="PackedScene" uid="uid://bl0k7x6j5jn83" path="res://Scenes/player.tscn" id="2_12fag"]
+[ext_resource type="PackedScene" uid="uid://ctfs5qavj5xyr" path="res://Scenes/player.tscn" id="2_12fag"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1q6tm"]
 texture = ExtResource("1_smnlx")
@@ -841,23 +841,23 @@ size = Vector2(50, 95)
 script/source = "extends Camera2D
 "
 
-[node name="Level_2" type="Node2D" unique_id=103718171]
+[node name="Level_2" type="Node2D"]
 script = ExtResource("1_12fag")
 
-[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1772860339]
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray(0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 12, 0, 0, 0, 4, 0, 255, 255, 0, 0, 0, 0, 12, 0, 0, 0, 8, 0, 255, 255, 0, 0, 0, 0, 12, 0, 0, 0, 12, 0, 255, 255, 0, 0, 0, 0, 12, 0, 0, 0)
 tile_set = SubResource("TileSet_v36qu")
 
-[node name="transition_point" type="Area2D" parent="." unique_id=1715561820]
+[node name="transition_point" type="Area2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="transition_point" unique_id=223079245]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="transition_point"]
 position = Vector2(149, -78)
 shape = SubResource("RectangleShape2D_12fag")
 
-[node name="player" parent="." unique_id=1265160510 instance=ExtResource("2_12fag")]
+[node name="player" parent="." instance=ExtResource("2_12fag")]
 position = Vector2(19.000006, -84.00001)
 
-[node name="Camera2D" type="Camera2D" parent="player" unique_id=349328866]
+[node name="Camera2D" type="Camera2D" parent="player"]
 position = Vector2(-709.99994, -1299.9999)
 scale = Vector2(9.999999, 9.999999)
 zoom = Vector2(0.6, 0.6)
