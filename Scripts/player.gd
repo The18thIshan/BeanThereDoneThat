@@ -39,7 +39,7 @@ const CAPSULE_HEIGHT: float = 97.4
 # --- WEAPONRY CONSTANTS (FIXED HULL CANNONS) ---
 const LASER_RANGE = 5000.0
 const LASER_COOLDOWN = 0.6  
-const LASER_DURATION = 10 
+const LASER_DURATION = 1 
 const MAX_BOUNCES = 3 # Increase this if you want absolute chaos
 
 # --- CAMERA CONSTANTS ---

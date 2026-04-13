@@ -17,10 +17,10 @@ func update_paths():
 	print(current_level)
 	if current_level_name == "level_1":
 		level_number += 1
-		next_scene_path = "res://Scenes/Levels/level_2.tscn"
+		next_scene_path = "res://Scenes/Levels/Level2.tscn"
 	elif current_level_name == "level_2":
 		level_number += 1
-		next_scene_path = "res://scenes/level_3.tscn"
+		next_scene_path = "res://scenes/Level3.tscn"
 	elif current_level_name == "level_3":
 		level_number += 1
 		next_scene_path = "res://scenes/level_4.tscn"
